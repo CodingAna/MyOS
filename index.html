@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body style="background-color: black;">
+    <div id="device" class="unselectable" style="z-index: 1; position: absolute; width: 1300px; height: 800px; top: calc(50% - 400px); left: calc(50% - 650px); background-color: #777; border-radius: 15px;">
+      <canvas id="hw_display" class="unselectable" width="1200px" height="700px" style="user-select: none; z-index: 2; position: absolute; top: calc(50% - 350px); left: calc(50% - 600px); background-color: #000; border-radius: 5px;"></canvas>
+      <canvas id="cache_display" width="1200px" height="700px" hidden></canvas>
+      <div id="hw_homebutton" class="unselectable" style="z-index: 3; position: absolute; width: 40px; height: 40px; top: calc(50% - 20px); left: calc(50% + 605px); background-color: #BBB; border-radius: 100%;"></div>
+    </div>
+    <div>
+      <img id="cache_image" hidden>
+    </div>
+    <script type="module">
+      // This is the "bare-metal"
+
+      import { OS } from './OS.js';
+      import { App } from "./App.js";
+      import { Hardware, HardwareTypes } from "./Hardware.js";
+      import { Event, EventTypes } from "./Event.js";
+      import { RenderManager } from "./RenderManager.js";
+
+      let hw_display = new Hardware(HardwareTypes.DISPLAY, document.getElementById("hw_display"));
+      let hw_homebutton = new Hardware(HardwareTypes.BUTTON, document.getElementById("hw_homebutton"));
+
+      let cache_display = new Hardware(HardwareTypes.DISPLAY, document.getElementById("cache_display"), true);
+      let cache_image = new Hardware(HardwareTypes.IMAGE, document.getElementById("cache_image"), true);
+
+      // Parameters are apps, hardware and events
+      let os = new OS(hw_display, hw_homebutton, cache_display, cache_image);
+
+      let frames = 0;
+      let start = new Date().getTime();
+      let renderDuration = 0;
+
+      let testApp = new App("TestApp", (renderManager, displayWidth, displayHeight) => {
+        renderManager.rect(0, 0, displayWidth, displayHeight, "#000000"); // This works wonders; Everything that draws above is not pixelated.
+
+        renderManager.roundRect(20, 20, displayWidth - 40, displayHeight - 40, 10, "#EE8888");
+        renderManager.rect(10, 40, 200, 350, "#1155FF");
+        renderManager.rect(80, 120, 420, 320, "#11FF55", "stroke");
+        renderManager.rect(300, 300, 100, 20, "#5511FF");
+        renderManager.roundRect(200, 10, 100, 50, 10, "#55FF11");
+        renderManager.arc(500, 100, 40, 0, 2*Math.PI, "#FF1155", "stroke");
+        renderManager.arc(350, 150, 60, 0, 2*Math.PI, "#FF5511");
+        renderManager.text(100, 100, "Hello World!", "Arial", "28pt");
+        
+        renderDuration = 1000 / (new Date().getTime()-start);
+        start = new Date().getTime();
+      }, [
+        new Event(EventTypes.MOUSE_CLICK, (eventParameters) => {
+          console.log("test event");
+          console.log(eventParameters)
+        }), // event interaction siehe os.js der kommentar vor dem app launch
+      ]);
+
+      os.launchApp(testApp);
+    </script>
+  </body>
+</html>
