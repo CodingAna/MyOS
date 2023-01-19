@@ -5,10 +5,13 @@
     <title></title>
   </head>
   <body style="background-color: black;">
-    <div id="device" class="unselectable" style="z-index: 1; position: absolute; width: 1300px; height: 800px; top: calc(50% - 400px); left: calc(50% - 650px); background-color: #777; border-radius: 15px;">
-      <canvas id="hw_display" class="unselectable" width="1200px" height="700px" style="user-select: none; z-index: 2; position: absolute; top: calc(50% - 350px); left: calc(50% - 600px); background-color: #000; border-radius: 5px;"></canvas>
-      <canvas id="cache_display" width="1200px" height="700px" hidden></canvas>
-      <div id="hw_homebutton" class="unselectable" style="z-index: 3; position: absolute; width: 40px; height: 40px; top: calc(50% - 20px); left: calc(50% + 605px); background-color: #BBB; border-radius: 100%;"></div>
+    <div id="device" class="unselectable" style="z-index: 1; position: absolute; width: 896px; height: 606px; top: calc(50% - 303px); left: calc(50% - 448px); background-color: #2A2A2A; border-radius: 16px;">
+      <!--<canvas id="hw_display" class="unselectable" width="796px" height="556px" style="user-select: none; z-index: 2; position: absolute; top: calc(50% - 360px); left: calc(50% - 540px); background-color: #000; border-radius: 5px;"></canvas>-->
+      <canvas id="hw_display" class="unselectable" width="796px" height="556px" style="user-select: none; z-index: 2; position: relative; top: 25px; left: 25px; background-color: #000; border-radius: 8px;"></canvas>
+
+      <canvas id="cache_display" width="796px" height="556px" hidden></canvas>
+
+      <div id="hw_homebutton" class="unselectable" style="z-index: 3; position: absolute; width: 46px; height: 46px; top: calc(50% - 23px); left: calc(50% + 388px); background-color: #111; border-radius: 100%; border: 1px dotted #AAA;"></div>
     </div>
     <div>
       <img id="cache_image" hidden>
@@ -35,9 +38,60 @@
       let start = new Date().getTime();
       let renderDuration = 0;
 
+      // 796 x 556
+
       let testApp = new App("TestApp", (renderManager, displayWidth, displayHeight) => {
         renderManager.rect(0, 0, displayWidth, displayHeight, "#000000"); // This works wonders; Everything that draws above is not pixelated.
 
+        let paddingHorizontal = 20;
+        let paddingVertical = 60;
+        let cornerRadius = 8;
+        let blockColor = "#333";
+        let lineColor = "#555";
+
+        // Settings Top Text
+        renderManager.text(paddingHorizontal, paddingVertical, "Settings", "Arial", "20pt");
+
+        // iCloud Name Block
+        renderManager.roundRect(paddingHorizontal, paddingVertical+20, 220, 40, cornerRadius, blockColor);
+        renderManager.arc(paddingHorizontal+5+15, paddingVertical+20+5+15, 15, 0, 2*Math.PI, "#80BCA0");
+        renderManager.text(paddingHorizontal+5+15+10+16, paddingVertical+20+5+6+16, "Ana Baginski", "Arial", "16pt");
+
+        // Connectivity Block
+        for (let i=0; i<6; i++) {
+          if (i === 0)
+            renderManager.roundRect(paddingHorizontal, paddingVertical+20+5+6+16+30+(40*i), 220, 40, [cornerRadius, cornerRadius, 0, 0], blockColor);
+          else if (i === 5)
+            renderManager.roundRect(paddingHorizontal, paddingVertical+20+5+6+16+30+(40*i), 220, 40, [0, 0, cornerRadius, cornerRadius], blockColor);
+          else
+            renderManager.rect(paddingHorizontal, paddingVertical+20+5+6+16+30+(40*i), 220, 40, blockColor);
+
+          let iconY = paddingVertical+20+5+6+16+30+(40*i)+5;
+          let iconColor = "#FFFFFF";
+          if (i === 0) iconColor = "#F8A030";
+          if (i === 1 || i === 2 || i === 5) iconColor = "#105AFF";
+          if (i === 3 || i === 4) iconColor = "#3ACA5A";
+          renderManager.roundRect(paddingHorizontal+5, iconY, 30, 30, 4, iconColor);
+        }
+        for (let i=0; i<5; i++) {
+          let lineY = paddingVertical+20+5+6+16+30+(40*(i+1));
+          renderManager.line(paddingHorizontal+40, lineY, paddingHorizontal+220, lineY, lineColor);
+        }
+
+        // Notification Block
+        for (let i=0; i<4; i++) {
+          if (i === 0)
+            renderManager.roundRect(paddingHorizontal, paddingVertical+20+5+6+16+30+(40*6)+20+(40*i), 220, 40, [cornerRadius, cornerRadius, 0, 0], blockColor);
+          else if (i === 3)
+            renderManager.roundRect(paddingHorizontal, paddingVertical+20+5+6+16+30+(40*6)+20+(40*i), 220, 40, [0, 0, cornerRadius, cornerRadius], blockColor);
+          else
+            renderManager.rect(paddingHorizontal, paddingVertical+20+5+6+16+30+(40*6)+20+(40*i), 220, 40, blockColor);
+        }
+        for (let i=0; i<3; i++) {
+          let lineY = paddingVertical+20+5+6+16+30+(40*(6+1)+20+(40*i));
+          renderManager.line(paddingHorizontal+40, lineY, paddingHorizontal+220, lineY, lineColor);
+        }
+/*
         renderManager.roundRect(20, 20, displayWidth - 40, displayHeight - 40, 10, "#EE8888");
         renderManager.rect(10, 40, 200, 350, "#1155FF");
         renderManager.rect(80, 120, 420, 320, "#11FF55", "stroke");
@@ -46,7 +100,7 @@
         renderManager.arc(500, 100, 40, 0, 2*Math.PI, "#FF1155", "stroke");
         renderManager.arc(350, 150, 60, 0, 2*Math.PI, "#FF5511");
         renderManager.text(100, 100, "Hello World!", "Arial", "28pt");
-        
+*/
         renderDuration = 1000 / (new Date().getTime()-start);
         start = new Date().getTime();
       }, [
