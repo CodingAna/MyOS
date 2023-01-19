@@ -59,6 +59,16 @@ export class RenderManager {
     }
   }
 
+  line = (x, y, toX, toY, color) => {
+    if (color === undefined) color = "#FFFFFF";
+
+    this._context.beginPath();
+    this._context.strokeStyle = color;
+    this._context.moveTo(x, y);
+    this._context.lineTo(toX, toY);
+    this._context.stroke();
+  }
+
   text = (x, y, text, fontStyle, fontSize, color, drawStyle) => {
     if (fontStyle === undefined) fontStyle = "Arial";
     if (fontSize === undefined) fontSize = "18pt";
